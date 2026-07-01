@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Aura — Voice AI Execution</title>
+<link rel="stylesheet" href="assets/theme.css" />
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar glass"></aside>
+  <header class="topbar glass" data-crumb="Voice AI Execution"></header>
+
+  <section class="view glass">
+    <div class="view-head">
+      <div>
+        <h2>Voice AI Execution</h2>
+      </div>
+      <div class="vh-acts">
+        <button class="btn sm" onclick="window.toast('Opened Voice AI call settings')">Voice settings</button>
+        <button class="btn primary sm" onclick="window.toast('Placing manual Voice AI call')">New call</button>
+      </div>
+    </div>
+
+    <div class="view-body">
+      <div class="kpi-row">
+        <div class="kpi k-cyan"><div class="kl">Calls in progress</div><div class="kv">2</div><div class="kd"><span class="dot live"></span> live now</div></div>
+        <div class="kpi k-green"><div class="kl">Connected today</div><div class="kv">41</div><div class="kd">92% answer rate</div></div>
+        <div class="kpi k-violet"><div class="kl">Avg handle time</div><div class="kv">1:08</div><div class="kd"><span class="up">14s</span> vs last wk</div></div>
+        <div class="kpi k-amber"><div class="kl">Escalated to human</div><div class="kv">5</div><div class="kd">no-answer fallback</div></div>
+        <div class="kpi k-green"><div class="kl">Confirmed actions</div><div class="kv">36</div><div class="kd">written back to events</div></div>
+      </div>
+
+      <div class="sec">
+        <div class="sec-title">Live calls <span class="st-meta">streaming</span></div>
+        <div class="grid-2" id="liveCalls"></div>
+      </div>
+
+      <div class="sec">
+        <div class="sec-title">Recent call log</div>
+        <div class="card" style="padding:6px 8px">
+          <table class="dtable">
+            <thead><tr><th>Time</th><th>Recipient</th><th>Reason / linked event</th><th>Outcome</th><th>Duration</th><th>Result</th></tr></thead>
+            <tbody id="logRows"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<script>window.AURA_PAGE='voice';</script>
+<script src="assets/shell.js"></script>
+<script>
+const LIVE=[
+  { who:'Duty Manager — S. Okafor', role:'Internal · EV-2044 (Fire pre-alarm)', status:'connected · 00:24',
+    lines:[
+      {s:'ai',t:'This is the Aura operations line for Grand Marina. A life-safety pre-alarm was raised on Tower B, stairwell seven. Are you able to respond now?'},
+      {s:'human',t:'Yes, I\'m two floors away. Heading there.'},
+      {s:'ai',t:'Understood. Security is already en route. I\'ll hold the evacuation comms primed but inactive until you confirm. Shall I notify the Chief Engineer as backup?'},
+      {s:'human',t:'Yes, loop him in.'},
+      {s:'ai',t:'Done. Logging your acknowledgement to event EV-2044 now.'},
+    ]},
+  { who:'Airport Transfer — LuxCar vendor', role:'External · EV-2041 (VIP arrival)', status:'ringing...',
+    lines:[
+      {s:'ai',t:'Calling to confirm the 13:30 airport pickup for a Platinum guest, Mr. Reyes, flight arriving terminal 2. Can you confirm a vehicle is assigned?'},
+      {s:'human',t:'(ringing — awaiting answer)'},
+    ]},
+];
+const LOG=[
+  ['10:42','J. Tan (Butler)','EV-2041 · Assign butler to VIP','Accepted assignment, en route','0:46','ok'],
+  ['10:38','Housekeeping floor 9','EV-2035 · Pre-stage relocation rooms','Confirmed 4 rooms ready','1:12','ok'],
+  ['10:31','Guest — Room 1142','EV-2031 · Service recovery offer','Accepted quiet-wing move','2:03','ok'],
+  ['10:24','Spa Manager','EV-2043 · Double-booking resolution','Approved 16:30 alt + upgrade','1:31','ok'],
+  ['10:09','Front desk lead','EV-2038 · Add 2 evening agents','No answer — escalated to roster','0:38','fail'],
+  ['09:55','Vendor — FreshFlora','Amenity restock for VIP suite','Confirmed delivery by 12:00','1:05','ok'],
+];
+
+document.getElementById('liveCalls').innerHTML=LIVE.map(c=>`
+  <div class="voice-call">
+    <div class="vc-head">
+      <div><div class="vc-name">${c.who}</div><div class="vc-meta">${c.role}</div></div>
+      <div class="voice-wave">${[10,16,8,18,6,14,9].map(h=>`<i style="height:${h}px;animation-delay:${(h%5)*0.12}s"></i>`).join('')}</div>
+    </div>
+    <div class="vc-body">${c.lines.map(l=>`<div class="vc-line ${l.s}"><span class="who">${l.s==='ai'?'Aura':'Them'}</span><span class="txt">${l.t}</span></div>`).join('')}</div>
+    <div style="padding:10px 15px;border-top:1px solid var(--border);display:flex;align-items:center;gap:10px;font-size:11px;color:var(--text-faint)">
+      <span class="chip ${c.status.includes('ringing')?'c-wait':'c-live'}"><span class="cdot"></span>${c.status}</span>
+      <span style="flex:1"></span>
+      <button class="btn sm" onclick="window.toast('Joined live call')">Listen in</button>
+      <button class="btn sm" onclick="window.toast('Call handed to human agent')">Take over</button>
+    </div>
+  </div>`).join('');
+
+document.getElementById('logRows').innerHTML=LOG.map(r=>`
+  <tr>
+    <td class="mono" style="color:var(--text-faint)">${r[0]}</td>
+    <td><b class="strong">${r[1]}</b></td>
+    <td>${r[2]}</td>
+    <td>${r[3]}</td>
+    <td class="mono">${r[4]}</td>
+    <td>${r[5]==='ok'?'<span class="chip c-live"><span class="cdot"></span>Confirmed</span>':'<span class="chip c-fail"><span class="cdot"></span>Escalated</span>'}</td>
+  </tr>`).join('');
+</script>
+</body>
+</html>

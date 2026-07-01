@@ -1,0 +1,196 @@
+/* ============================================================
+   IntGen Stay Intelligence Engine - Design System
+   Dark + Glassmorphism / Command Center aesthetic
+   ============================================================ */
+
+:root {
+  /* --- Base surfaces --- */
+  --bg-900: #050504;
+  --bg-800: #090807;
+  --bg-700: #11100d;
+  --bg-600: #19150f;
+
+  /* --- Glass --- */
+  --glass-bg: rgba(255, 255, 255, 0.04);
+  --glass-bg-strong: rgba(255, 255, 255, 0.07);
+  --glass-border: rgba(255, 255, 255, 0.10);
+  --glass-border-strong: rgba(255, 255, 255, 0.18);
+  --glass-blur: 22px;
+
+  /* --- Accent (neon) --- */
+  --accent: #d4bf8b;
+  --accent-2: #b58a57;
+  --accent-3: #8b613c;
+  --accent-glow: rgba(181, 138, 87, 0.34);
+
+  /* --- Semantic --- */
+  --pos: #4ade80;
+  --neg: #fb7185;
+  --warn: #fbbf24;
+
+  /* --- Text --- */
+  --text-hi: #f5f8ff;
+  --text-mid: rgba(245, 248, 255, 0.72);
+  --text-lo: rgba(245, 248, 255, 0.46);
+  --text-faint: rgba(245, 248, 255, 0.28);
+
+  /* --- Geometry --- */
+  --radius-sm: 10px;
+  --radius: 16px;
+  --radius-lg: 24px;
+  --radius-xl: 32px;
+
+  /* --- Shadows --- */
+  --shadow-soft: 0 12px 40px rgba(0, 0, 0, 0.45);
+  --shadow-deep: 0 30px 80px rgba(0, 0, 0, 0.6);
+
+  /* --- Layout --- */
+  --nav-w: 268px;
+  --maxw: 1440px;
+
+  /* --- Type --- */
+  --font: Arial, Helvetica, -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+  --mono: Arial, Helvetica, -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: var(--font);
+  color: var(--text-hi);
+  background: var(--bg-900);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  line-height: 1.5;
+  overflow-x: hidden;
+}
+
+/* Ambient gradient backdrop used on inner pages */
+.ambient {
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+  background:
+    radial-gradient(ellipse 80% 60% at 15% 0%, rgba(181, 138, 87, 0.16), transparent 60%),
+    radial-gradient(ellipse 70% 60% at 100% 20%, rgba(212, 191, 139, 0.10), transparent 55%),
+    radial-gradient(ellipse 90% 70% at 50% 110%, rgba(139, 97, 60, 0.12), transparent 60%),
+    var(--bg-900);
+}
+.ambient::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.025'/%3E%3C/svg%3E");
+  pointer-events: none;
+}
+
+/* ---------- Typography helpers ---------- */
+h1, h2, h3, h4 { line-height: 1.12; letter-spacing: -0.02em; font-weight: 600; }
+.eyebrow {
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--accent);
+  font-weight: 600;
+}
+.muted { color: var(--text-mid); }
+.faint { color: var(--text-lo); }
+.mono { font-family: var(--mono); }
+
+/* ---------- Glass card ---------- */
+.glass {
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  backdrop-filter: blur(var(--glass-blur)) saturate(140%);
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(140%);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-soft);
+}
+.glass-strong {
+  background: var(--glass-bg-strong);
+  border-color: var(--glass-border-strong);
+}
+
+/* ---------- Buttons ---------- */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 26px;
+  border-radius: 999px;
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  cursor: pointer;
+  border: 1px solid transparent;
+  text-decoration: none;
+  transition: transform .25s cubic-bezier(.2,.8,.2,1), box-shadow .25s, background .25s, border-color .25s;
+  white-space: nowrap;
+}
+.btn-primary {
+  color: #120f09;
+  background: linear-gradient(135deg, var(--accent), #b58a57);
+  box-shadow: 0 8px 30px var(--accent-glow);
+}
+.btn-primary:hover { transform: translateY(-2px); box-shadow: 0 14px 44px var(--accent-glow); }
+.btn-ghost {
+  color: var(--text-hi);
+  background: var(--glass-bg);
+  border-color: var(--glass-border);
+  backdrop-filter: blur(12px);
+}
+.btn-ghost:hover { border-color: var(--glass-border-strong); transform: translateY(-2px); }
+
+.btn .arrow { transition: transform .25s; }
+.btn:hover .arrow { transform: translateX(4px); }
+
+/* ---------- Pills / tags ---------- */
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  color: var(--text-mid);
+}
+.pill .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 10px var(--accent); }
+.pill.pos { color: var(--pos); border-color: rgba(74,222,128,0.3); }
+.pill.pos .dot { background: var(--pos); box-shadow: 0 0 10px var(--pos); }
+
+/* ---------- Trend deltas ---------- */
+.delta { font-weight: 600; font-size: 13px; display: inline-flex; align-items: center; gap: 4px; }
+.delta.up { color: var(--pos); }
+.delta.down { color: var(--neg); }
+
+/* ---------- Utility ---------- */
+.container { width: 100%; max-width: var(--maxw); margin: 0 auto; padding: 0 32px; }
+.grid { display: grid; gap: 20px; }
+.flex { display: flex; }
+.between { justify-content: space-between; }
+.center { align-items: center; }
+.gap-sm { gap: 10px; }
+.gap { gap: 18px; }
+.divider { height: 1px; background: var(--glass-border); border: 0; }
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 999px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.18); }
+
+/* ---------- Logo (SUNWAY IntGen brand image) - global ---------- */
+.logo { display: inline-flex; align-items: center; gap: 10px; text-decoration: none; }
+.logo__img { height: 34px; width: auto; display: block; flex: 0 0 auto; }
+.logo__divider, .logo__sub { display: none; }
+.nav__brand .logo__img { height: 36px; }
+
+/* Reveal on scroll */
+[data-reveal] { opacity: 0; transform: translateY(24px); transition: opacity .8s cubic-bezier(.2,.8,.2,1), transform .8s cubic-bezier(.2,.8,.2,1); }
+[data-reveal].in { opacity: 1; transform: none; }

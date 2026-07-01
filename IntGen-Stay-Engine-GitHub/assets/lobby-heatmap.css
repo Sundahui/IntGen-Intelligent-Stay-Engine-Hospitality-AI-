@@ -1,0 +1,102 @@
+.lobby-density-stage {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  min-height: 330px;
+  max-height: 560px;
+  width: 100%;
+  margin-top: 1rem;
+  overflow: hidden;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.025), transparent 28%),
+    radial-gradient(circle at 54% 54%, rgba(212, 191, 139, 0.08), transparent 38%),
+    #020202;
+}
+
+.lobby-density-stage svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.lobby-density-stage::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(rgba(255, 255, 255, 0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.035) 1px, transparent 1px);
+  background-size: 20px 20px;
+  mix-blend-mode: screen;
+  opacity: 0.16;
+}
+
+.lobby-density-stage::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 50% 45%, transparent 0 48%, rgba(0, 0, 0, 0.48) 100%),
+    linear-gradient(90deg, rgba(0, 0, 0, 0.46), transparent 14% 86%, rgba(0, 0, 0, 0.42));
+}
+
+.lobby-density-column {
+  animation: lobby-density-rise 620ms cubic-bezier(0.2, 0.78, 0.18, 1) both;
+  transform-box: fill-box;
+  transform-origin: bottom;
+  shape-rendering: crispEdges;
+}
+
+.lobby-density-zone {
+  cursor: pointer;
+}
+
+.lobby-density-zone .zone-outline {
+  opacity: 0;
+  transition: opacity 180ms ease, stroke 180ms ease;
+}
+
+.lobby-density-zone:hover .zone-outline,
+.lobby-density-zone.is-selected .zone-outline {
+  opacity: 1;
+}
+
+.lobby-density-label {
+  font: 700 10px/1 Arial, Helvetica, sans-serif;
+  letter-spacing: 0;
+  paint-order: stroke;
+  stroke: rgba(0, 0, 0, 0.86);
+  stroke-width: 3px;
+}
+
+.lobby-density-count {
+  font: 700 9px/1 Arial, Helvetica, sans-serif;
+  letter-spacing: 0;
+  paint-order: stroke;
+  stroke: rgba(0, 0, 0, 0.9);
+  stroke-width: 3px;
+}
+
+@keyframes lobby-density-rise {
+  from {
+    opacity: 0;
+    transform: scaleY(0.15) translateY(5px);
+  }
+  to {
+    opacity: 1;
+    transform: scaleY(1) translateY(0);
+  }
+}
+
+@media (max-width: 900px) {
+  .lobby-density-stage {
+    min-height: 0;
+    overflow-x: auto;
+  }
+
+  .lobby-density-stage svg {
+    min-width: 980px;
+    min-height: 552px;
+  }
+}

@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Enterprise Hotel Training Platform</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+  <div class="shell">
+    <aside class="rail" aria-label="Workspace navigation">
+      <div class="rail-logo">
+        <img src="assets/sunway-intgen-logo-cropped.png" alt="Sunway IntGen" width="104">
+      </div>
+      <button class="rail-button rail-nav active" aria-label="Overview" data-label="Overview" data-view="overview"><i data-lucide="layout-dashboard"></i></button>
+      <button class="rail-button rail-nav" aria-label="Assignments" data-label="Assignments" data-view="assignments"><i data-lucide="send"></i></button>
+      <button class="rail-button rail-nav" aria-label="Learning Paths" data-label="Learning Paths" data-view="paths"><i data-lucide="workflow"></i></button>
+      <button class="rail-button rail-nav" aria-label="Employee Portal" data-label="Employee Portal" data-view="employee"><i data-lucide="users"></i></button>
+      <button class="rail-button rail-nav" aria-label="Analytics" data-label="Analytics" data-view="analytics"><i data-lucide="pie-chart"></i></button>
+      <button class="rail-button utility" aria-label="Calendar" data-label="Calendar"><i data-lucide="calendar-days"></i></button>
+      <button class="rail-button utility alert" aria-label="Compliance Alerts" data-label="Compliance Alerts"><i data-lucide="triangle-alert"></i></button>
+      <div class="rail-spacer"></div>
+      <button class="rail-button utility" id="dimToggle" aria-label="Dim mode" data-label="Dim Mode"><i data-lucide="moon"></i></button>
+      <button class="rail-button utility black" aria-label="Settings" data-label="Settings"><i data-lucide="sun"></i></button>
+    </aside>
+
+    <main class="app">
+      <header class="topbar">
+        <div class="top-actions">
+          <button class="round-button" aria-label="Search"><i data-lucide="search"></i></button>
+          <button class="round-button has-dot" aria-label="Inbox"><i data-lucide="mail"></i></button>
+          <button class="round-button has-dot" aria-label="Notifications"><i data-lucide="bell"></i></button>
+          <img class="avatar me" src="https://i.pravatar.cc/96?img=47" alt="Administrator">
+        </div>
+      </header>
+
+      <section class="view active" id="overview">
+        <div class="page-title">
+          <div>
+            <h1>Hotel Training Overview</h1>
+          </div>
+        </div>
+
+        <section class="glass-panel board-panel">
+          <div class="panel-head">
+            <div>
+              <h2>Training Assignment Pipelines</h2>
+              <p>Drag cohort assignments between stages to update HR ownership, learner status, and certification flow.</p>
+            </div>
+            <div class="segmented" id="pipelineFilters">
+              <button class="active" data-filter="all">Pipelines</button>
+              <button data-filter="In Progress">In Progress</button>
+              <button data-filter="Certified">Certified</button>
+              <button data-filter="Overdue">Overdue</button>
+            </div>
+            <div class="icon-set">
+              <button><i data-lucide="upload"></i></button>
+              <button><i data-lucide="calendar"></i></button>
+              <button><i data-lucide="maximize-2"></i></button>
+            </div>
+          </div>
+          <div class="kanban" id="kanban"></div>
+        </section>
+
+        <section class="metrics-grid">
+          <article class="glass-panel chart-card">
+            <div class="panel-head compact">
+              <div>
+                <h2>Top Training Drivers</h2>
+                <p>Last 30 days</p>
+              </div>
+              <button class="round-button small"><i data-lucide="download"></i></button>
+            </div>
+            <div class="driver-chart">
+              <div class="donut red" style="--value: 74"><span>74%</span></div>
+              <div class="legend">
+                <span><b class="blue"></b> Front Office SOP <strong>54%</strong></span>
+                <span><b class="red"></b> Safety & Compliance <strong>27%</strong></span>
+                <span><b class="yellow"></b> Guest Recovery Practice <strong>19%</strong></span>
+              </div>
+            </div>
+          </article>
+          <article class="glass-panel chart-card">
+            <div class="panel-head compact">
+              <div>
+                <h2>Training Metrics</h2>
+                <p>Completion and certification health</p>
+              </div>
+              <button class="round-button small"><i data-lucide="calendar"></i></button>
+            </div>
+            <div class="rings">
+              <div class="ring" style="--value: 86; --accent:#8aa7df"><strong>86%</strong><span>Completion</span></div>
+              <div class="ring" style="--value: 64; --accent:#f4df72"><strong>4.6</strong><span>Avg score</span></div>
+              <div class="ring" style="--value: 92; --accent:#94a9aa"><strong>92%</strong><span>Certified</span></div>
+            </div>
+          </article>
+        </section>
+      </section>
+
+      <section class="view" id="assignments">
+        <div class="page-title">
+          <div>
+            <h1>Department Training Content Management</h1>
+          </div>
+          <button class="primary-action" id="newAssignment"><i data-lucide="plus"></i> New Assignment</button>
+        </div>
+        <div class="assignment-toolbar">
+          <button class="active" data-department-filter="all">All Cohorts</button>
+          <button data-department-filter="frontline">Frontline</button>
+          <button data-department-filter="operations">Operations</button>
+          <button data-department-filter="leadership">Leadership</button>
+          <button data-department-filter="enablement">Enablement</button>
+        </div>
+        <div class="department-grid" id="departmentGrid"></div>
+      </section>
+
+      <section class="view" id="departmentDetail">
+        <div class="page-title">
+          <div>
+            <h1 id="departmentDetailTitle">Department Content</h1>
+          </div>
+          <button class="secondary-action" id="backToDepartments"><i data-lucide="arrow-left"></i> Back</button>
+        </div>
+        <section class="glass-panel content-detail-panel">
+          <div class="content-detail-hero">
+            <div>
+              <span class="eyebrow">Department Library</span>
+              <h2 id="departmentDetailName">Front Desk Ops</h2>
+              <p id="departmentDetailSummary">Manage manuals, SOP documents, videos, simulations, and assessment material for this department.</p>
+            </div>
+            <button class="primary-action"><i data-lucide="plus"></i> Add Content</button>
+          </div>
+          <div class="content-library-grid" id="contentLibraryGrid"></div>
+        </section>
+      </section>
+
+      <section class="view" id="paths">
+        <div class="page-title">
+          <div>
+            <h1>Training Journey Builder</h1>
+          </div>
+        </div>
+        <div class="journey-switcher" id="journeyDepartmentSwitcher"></div>
+        <section class="glass-panel journey-panel">
+          <div class="journey-panel-title" id="journeyPanelTitle">Front Office New Joiner Journey</div>
+          <div class="avatar-strip" id="avatarStrip"></div>
+          <div class="journey-scroll">
+          <div class="journey-canvas" id="journeyCanvas">
+            <div class="journey-stage wide" data-stage="Audience Allocation">
+              <h3>Audience Allocation</h3>
+              <div class="task-card">
+                <span class="cohort-stack">
+                  <img src="https://i.pravatar.cc/80?img=12" alt="">
+                  <img src="https://i.pravatar.cc/80?img=5" alt="">
+                  <img src="https://i.pravatar.cc/80?img=32" alt="">
+                </span>
+                Front Desk batch A - 24 learners<i data-lucide="check-check"></i>
+              </div>
+              <div class="task-card">
+                <span class="cohort-stack">
+                  <img src="https://i.pravatar.cc/80?img=20" alt="">
+                  <img src="https://i.pravatar.cc/80?img=44" alt="">
+                </span>
+                Guest Services line - 18 learners<i data-lucide="calendar"></i>
+              </div>
+              <div class="task-card muted-task"><span class="plus-bubble">+</span>Link department, role, and shift<i data-lucide="ellipsis"></i></div>
+            </div>
+            <div class="connector blue"></div>
+            <div class="journey-stage tall" data-stage="Foundation Training">
+              <h3>Foundation Training</h3>
+              <div class="task-card"><img src="https://i.pravatar.cc/80?img=5" alt="">Front Desk check-in SOP<i data-lucide="check-check"></i></div>
+              <div class="task-card"><img src="https://i.pravatar.cc/80?img=20" alt="">Housekeeping room readiness<i data-lucide="check-check"></i></div>
+              <div class="task-card strong"><img src="https://i.pravatar.cc/80?img=44" alt="">IT system access basics<i data-lucide="ellipsis"></i></div>
+            </div>
+            <div class="connector blue"></div>
+            <div class="journey-stage tall" data-stage="Practice & Assessment">
+              <h3>Practice & Assessment</h3>
+              <div class="task-card ghost"><span class="plus-bubble">+</span>Scenario simulation: voice / text / video<i data-lucide="calendar"></i></div>
+              <div class="task-card ghost"><span class="plus-bubble">+</span>Learner quiz: SOP and safety<i data-lucide="calendar"></i></div>
+              <div class="task-card"><img src="https://i.pravatar.cc/80?img=15" alt="">Guest complaint recovery drill<i data-lucide="ellipsis"></i></div>
+            </div>
+            <div class="connector mixed"></div>
+            <div class="journey-stage tall" data-stage="Manager Review">
+              <h3>Manager Review</h3>
+              <div class="task-card"><img src="https://i.pravatar.cc/80?img=32" alt="">Review practical result<i data-lucide="check-check"></i></div>
+              <div class="task-card"><img src="https://i.pravatar.cc/80?img=12" alt="">Approve certification readiness<i data-lucide="calendar"></i></div>
+              <div class="task-card muted-task"><span class="plus-bubble">+</span>Request remediation if needed<i data-lucide="ellipsis"></i></div>
+            </div>
+            <div class="connector blue"></div>
+            <div class="journey-stage tall" data-stage="Certification">
+              <h3>Certification</h3>
+              <div class="task-card"><img src="https://i.pravatar.cc/80?img=59" alt="">Issue badge<i data-lucide="check-check"></i></div>
+              <div class="task-card"><img src="https://i.pravatar.cc/80?img=20" alt="">Record certificate<i data-lucide="calendar"></i></div>
+              <div class="task-card muted-task"><span class="plus-bubble">+</span>Schedule renewal reminder<i data-lucide="ellipsis"></i></div>
+            </div>
+            <div class="connector mixed"></div>
+            <div class="journey-stage tall" data-stage="Renewal Reminder">
+              <h3>Renewal Reminder</h3>
+              <div class="task-card"><img src="https://i.pravatar.cc/80?img=52" alt="">90-day SOP refresher<i data-lucide="calendar"></i></div>
+              <div class="task-card ghost"><span class="plus-bubble">+</span>Annual safety recertification<i data-lucide="calendar"></i></div>
+              <div class="task-card muted-task"><span class="plus-bubble">+</span>Auto-reassign expired certificates<i data-lucide="ellipsis"></i></div>
+            </div>
+            <div class="new-task-bank">
+              <span class="task-bank-title">Training Blocks</span>
+              <button class="bank-card active" draggable="true" data-template="Department Course">Department Course</button>
+              <button class="bank-card" draggable="true" data-template="Scenario Simulation">Scenario Simulation</button>
+              <button class="bank-card" draggable="true" data-template="Learner Quiz">Learner Quiz</button>
+              <button class="bank-card" draggable="true" data-template="Manager Review">Manager Review</button>
+              <button class="bank-card" draggable="true" data-template="Certificate Issue">Certificate Issue</button>
+              <button class="bank-card" draggable="true" data-template="Renewal Reminder">Renewal Reminder</button>
+            </div>
+          </div>
+          </div>
+        </section>
+      </section>
+
+      <section class="view" id="employee">
+        <div class="page-title">
+          <div>
+            <h1>Employee Learning Portal</h1>
+          </div>
+        </div>
+        <div class="employee-layout">
+          <section class="glass-panel learner-hero">
+            <div class="learner-copy">
+              <span class="eyebrow">Front Desk Operations</span>
+              <h2>Welcome back, John Smith</h2>
+              <p>Your service readiness path is 68% complete. Next up: practical handling for guest requests.</p>
+              <button class="primary-action"><i data-lucide="play"></i> Continue Learning</button>
+            </div>
+            <div class="learner-progress">
+              <div class="big-ring" style="--value:68"><strong>68%</strong><span>Path Progress</span></div>
+              <div class="mini-stats">
+                <span><strong>3</strong> active courses</span>
+                <span><strong>8</strong> certificates</span>
+                <span><strong>Dec 15</strong> next deadline</span>
+              </div>
+            </div>
+          </section>
+          <section class="course-lane" id="courseLane"></section>
+          <aside class="glass-panel employee-side">
+            <h2>Certification Status</h2>
+            <div class="certificate-card certified"><i data-lucide="badge-check"></i><span>Front Office SOP</span><strong>Valid</strong></div>
+            <div class="certificate-card warning"><i data-lucide="clock"></i><span>Guest Recovery Practical</span><strong>Due 5d</strong></div>
+            <div class="certificate-card"><i data-lucide="medal"></i><span>Service Simulation</span><strong>82%</strong></div>
+          </aside>
+        </div>
+      </section>
+
+      <section class="view" id="analytics">
+        <div class="page-title">
+          <div>
+            <h1>Enterprise Training Data</h1>
+          </div>
+        </div>
+        <div class="analytics-board">
+          <article class="glass-panel analytics-card"><span>Assigned Employees</span><strong>1,284</strong><div class="spark blue"></div></article>
+          <article class="glass-panel analytics-card"><span>Completion Rate</span><strong>86%</strong><div class="spark red"></div></article>
+          <article class="glass-panel analytics-card"><span>Certified Roles</span><strong>912</strong><div class="spark yellow"></div></article>
+          <article class="glass-panel analytics-card"><span>Overdue Items</span><strong>38</strong><div class="spark gray"></div></article>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <div class="modal" id="infoModal" aria-hidden="true">
+    <div class="modal-backdrop"></div>
+    <div class="modal-card info-card">
+      <button type="button" class="modal-close" aria-label="Close"><i data-lucide="x"></i></button>
+      <div class="info-head">
+        <span class="info-icon" id="infoModalIcon"><i data-lucide="info"></i></span>
+        <div>
+          <span class="eyebrow" id="infoModalEyebrow">Detail</span>
+          <h2 id="infoModalTitle">Title</h2>
+        </div>
+      </div>
+      <div class="info-body" id="infoModalBody"></div>
+      <div class="modal-actions" id="infoModalActions">
+        <button type="button" class="secondary-action modal-cancel">Close</button>
+        <button type="button" class="primary-action" id="infoModalPrimary">Got it</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal" id="courseModal" aria-hidden="true">
+    <div class="modal-backdrop"></div>
+    <div class="modal-card course-modal-card">
+      <button type="button" class="modal-close" aria-label="Close"><i data-lucide="x"></i></button>
+      <div id="courseModalContent"></div>
+    </div>
+  </div>
+
+  <div class="modal" id="assignmentModal" aria-hidden="true">
+    <div class="modal-backdrop"></div>
+    <form class="modal-card">
+      <button type="button" class="modal-close" aria-label="Close"><i data-lucide="x"></i></button>
+      <h2>Assign New Training</h2>
+      <label>Assignment Name<input id="assignmentName" placeholder="Create an assignment name" value="Front Office Service Readiness Sprint"></label>
+      <label>Audience Rule
+        <select id="assignmentAudience" class="modal-select">
+          <option value="Front Desk - 86 learners">Front Desk - 86 learners</option>
+          <option value="Guest Services - 48 learners">Guest Services - 48 learners</option>
+          <option value="Operations Managers - 24 learners">Operations Managers - 24 learners</option>
+          <option value="New Joiners - 112 learners">New Joiners - 112 learners</option>
+        </select>
+      </label>
+      <label>HR Owner
+        <div class="select-row"><img src="https://i.pravatar.cc/80?img=15" alt="">John Smith<span>Front Desk Training Manager</span><i data-lucide="chevron-down"></i></div>
+      </label>
+      <label>Responsible HR Team
+        <div class="select-row overlap">
+          <img src="https://i.pravatar.cc/80?img=5" alt=""><img src="https://i.pravatar.cc/80?img=20" alt=""><img src="https://i.pravatar.cc/80?img=44" alt="">
+          <strong>Guest Services</strong><span>48 learners</span><i data-lucide="chevron-down"></i>
+        </div>
+      </label>
+      <label>Allocated Learning Hours
+        <div class="range-row"><span>225h</span><input type="range" value="62"></div>
+      </label>
+      <label>Assignment Description<textarea placeholder="Enter the learning outcome and complexity"></textarea></label>
+      <div class="modal-actions">
+        <button type="button" class="secondary-action modal-cancel">Cancel</button>
+        <button type="button" class="primary-action" id="createAssignment">Create Assignment</button>
+      </div>
+    </form>
+  </div>
+
+  <script src="app.js"></script>
+  <script src="../../assets/back-home.js" data-home="../../index.html"></script>
+</body>
+</html>

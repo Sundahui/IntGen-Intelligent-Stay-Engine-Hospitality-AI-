@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Aura — Connected Systems</title>
+<link rel="stylesheet" href="assets/theme.css" />
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar glass"></aside>
+  <header class="topbar glass" data-crumb="Connected Systems"></header>
+
+  <section class="view glass">
+    <div class="view-head">
+      <div>
+        <h2>Connected Systems</h2>
+      </div>
+      <div class="vh-acts">
+        <button class="btn sm" onclick="window.toast('Connector marketplace opened')">Add connector</button>
+        <button class="btn primary sm" onclick="window.toast('Re-syncing all connectors')">Sync now</button>
+      </div>
+    </div>
+
+    <div class="view-body">
+      <div class="kpi-row">
+        <div class="kpi k-green"><div class="kl">Connected</div><div class="kv" id="k-conn">0</div><div class="kd">of <span id="k-total">0</span> systems</div></div>
+        <div class="kpi k-cyan"><div class="kl">Events ingested (24h)</div><div class="kv">14.2k</div><div class="kd">across all sources</div></div>
+        <div class="kpi k-amber"><div class="kl">Degraded</div><div class="kv" id="k-deg">0</div><div class="kd">latency above SLA</div></div>
+        <div class="kpi k-violet"><div class="kl">Avg sync latency</div><div class="kv">1.8<span style="font-size:14px">s</span></div><div class="kd">real-time tier</div></div>
+      </div>
+
+      <div class="sec">
+        <div class="sec-title">Integrations <span class="st-meta" id="catMeta"></span></div>
+        <div class="grid-3" id="sysGrid"></div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<script>window.AURA_PAGE='systems';</script>
+<script src="assets/shell.js"></script>
+<script>
+const SYS=[
+  {n:'Opera PMS',cat:'Property Management',status:'live',events:'4.1k',lat:'0.9s'},
+  {n:'Canary',cat:'Guest Intelligence / VIP',status:'live',events:'820',lat:'1.2s'},
+  {n:'Building Mgmt (BMS)',cat:'Facility & HVAC',status:'live',events:'3.4k',lat:'0.6s'},
+  {n:'Life Safety System',cat:'Fire & Security',status:'live',events:'112',lat:'0.3s'},
+  {n:'Micros POS',cat:'F&B Point of Sale',status:'live',events:'2.7k',lat:'1.4s'},
+  {n:'Unifocus',cat:'Labor & Scheduling',status:'live',events:'640',lat:'2.1s'},
+  {n:'Guest Messaging',cat:'CRM / Sentiment',status:'live',events:'1.5k',lat:'1.1s'},
+  {n:'Spa & Wellness',cat:'Booking System',status:'degraded',events:'210',lat:'6.4s'},
+  {n:'Salto Door Locks',cat:'Access Control',status:'live',events:'990',lat:'0.8s'},
+  {n:'LuxCar Transport',cat:'Vendor / Logistics',status:'live',events:'88',lat:'2.8s'},
+  {n:'Revenue / Rate',cat:'Revenue Management',status:'live',events:'430',lat:'1.9s'},
+  {n:'WhatsApp Business',cat:'Guest Comms',status:'offline',events:'-',lat:'-'},
+];
+const chip=s=>s==='live'?'<span class="chip c-live"><span class="cdot"></span>Connected</span>':s==='degraded'?'<span class="chip c-wait"><span class="cdot"></span>Degraded</span>':'<span class="chip c-fail"><span class="cdot"></span>Offline</span>';
+
+document.getElementById('sysGrid').innerHTML=SYS.map(s=>`
+  <div class="sys-card">
+    <div class="sc-top">
+      <div style="flex:1"><div class="sc-name">${s.n}</div><div class="sc-cat">${s.cat}</div></div>
+      ${chip(s.status)}
+    </div>
+    <div class="sc-stats">
+      <div>Events 24h<b>${s.events}</b></div>
+      <div>Latency<b>${s.lat}</b></div>
+    </div>
+  </div>`).join('');
+
+document.getElementById('k-total').textContent=SYS.length;
+document.getElementById('k-conn').textContent=SYS.filter(s=>s.status==='live').length;
+document.getElementById('k-deg').textContent=SYS.filter(s=>s.status==='degraded').length;
+document.getElementById('catMeta').textContent=SYS.length+' sources';
+</script>
+</body>
+</html>

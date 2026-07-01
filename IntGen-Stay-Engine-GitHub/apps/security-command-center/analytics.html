@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Aura — Resolution Analytics</title>
+<link rel="stylesheet" href="assets/theme.css" />
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar glass"></aside>
+  <header class="topbar glass" data-crumb="Resolution Analytics"></header>
+
+  <section class="view glass">
+    <div class="view-head">
+      <div>
+        <h2>Resolution Analytics</h2>
+      </div>
+      <div class="vh-acts">
+        <button class="btn sm" onclick="window.toast('Range: last 7 days')">Last 7 days</button>
+        <button class="btn primary sm" onclick="window.toast('Generated weekly ops review deck')">Export report</button>
+      </div>
+    </div>
+
+    <div class="view-body">
+      <div class="kpi-row">
+        <div class="kpi k-green"><div class="kl">Resolution rate</div><div class="kv">96.4<span style="font-size:14px">%</span></div><div class="kd"><span class="up">+2.1pt</span> vs last wk</div></div>
+        <div class="kpi k-cyan"><div class="kl">Avg time-to-resolve</div><div class="kv">11.6<span style="font-size:14px">m</span></div><div class="kd"><span class="up">3.4m</span> faster</div></div>
+        <div class="kpi k-violet"><div class="kl">Autonomous share</div><div class="kv">71<span style="font-size:14px">%</span></div><div class="kd">closed without staff</div></div>
+        <div class="kpi k-amber"><div class="kl">Revenue protected</div><div class="kv">$48k</div><div class="kd">this week</div></div>
+        <div class="kpi k-green"><div class="kl">Guest-impact avoided</div><div class="kv">312</div><div class="kd">guests this week</div></div>
+      </div>
+
+      <div class="grid-2">
+        <div class="sec">
+          <div class="sec-title">Events resolved per day <span class="st-meta">last 7 days</span></div>
+          <div class="card"><div class="bars" id="vol"></div></div>
+        </div>
+        <div class="sec">
+          <div class="sec-title">How events were resolved</div>
+          <div class="card">
+            <div style="display:flex;align-items:center;gap:22px">
+              <div class="donut" style="background:conic-gradient(var(--accent-2) 0 71%, var(--accent) 71% 90%, var(--amber) 90% 100%)">
+                <div class="dc"><div class="dv">71%</div><div class="dl">auto</div></div>
+              </div>
+              <div style="flex:1">
+                <div class="legend-row"><span class="ldot" style="background:var(--accent-2)"></span> Fully autonomous <b>71%</b></div>
+                <div class="legend-row"><span class="ldot" style="background:var(--accent)"></span> AI + 1-tap approval <b>19%</b></div>
+                <div class="legend-row"><span class="ldot" style="background:var(--amber)"></span> Escalated to human <b>10%</b></div>
+              </div>
+            </div>
+            <div style="margin-top:16px;font-size:11.5px;color:var(--text-dim);line-height:1.6;border-top:1px solid var(--border);padding-top:13px">
+              <b style="color:var(--text)">Trend:</b> Autonomous share is up from 58% a month ago as staff approve more recommendation classes for auto-execution.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div class="sec">
+          <div class="sec-title">Resolution time by event class</div>
+          <div class="card">
+            <div id="byClass"></div>
+          </div>
+        </div>
+        <div class="sec">
+          <div class="sec-title">Resolution by zone <span class="st-meta">this week</span></div>
+          <div class="card" style="padding:6px 8px">
+            <table class="dtable">
+              <thead><tr><th>Zone</th><th>Events</th><th>Auto %</th><th>Avg resolve</th><th>SLA</th></tr></thead>
+              <tbody>
+                <tr><td><b class="strong">Lobby & FOH</b></td><td class="mono">142</td><td class="mono">68%</td><td class="mono">9.4m</td><td><span class="chip c-live"><span class="cdot"></span>99%</span></td></tr>
+                <tr><td><b class="strong">F&B & Leisure</b></td><td class="mono">96</td><td class="mono">74%</td><td class="mono">13.1m</td><td><span class="chip c-live"><span class="cdot"></span>97%</span></td></tr>
+                <tr><td><b class="strong">Guest Rooms</b></td><td class="mono">118</td><td class="mono">70%</td><td class="mono">12.8m</td><td><span class="chip c-wait"><span class="cdot"></span>94%</span></td></tr>
+                <tr><td><b class="strong">Back-of-House</b></td><td class="mono">61</td><td class="mono">81%</td><td class="mono">7.2m</td><td><span class="chip c-live"><span class="cdot"></span>100%</span></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<script>window.AURA_PAGE='analytics';</script>
+<script src="assets/shell.js"></script>
+<script>
+const VOL=[{d:'Mon',v:48},{d:'Tue',v:56},{d:'Wed',v:61},{d:'Thu',v:52},{d:'Fri',v:74},{d:'Sat',v:88},{d:'Sun',v:69}];
+const mx=Math.max(...VOL.map(d=>d.v));
+document.getElementById('vol').innerHTML=VOL.map(d=>`
+  <div class="bar"><span class="bv">${d.v}</span><div class="col alt" style="height:${Math.round(d.v/mx*100)}%"></div><span class="bl">${d.d}</span></div>`).join('');
+
+const CLS=[
+  {t:'Life-safety',v:2.1,max:18,cls:'m-green'},
+  {t:'VIP / Revenue',v:8.6,max:18,cls:'m-vio'},
+  {t:'Facility',v:16.4,max:18,cls:'m-amber'},
+  {t:'Guest service',v:11.2,max:18,cls:'m-red'},
+  {t:'Capacity / F&B',v:9.8,max:18,cls:''},
+];
+document.getElementById('byClass').innerHTML=CLS.map(c=>`
+  <div style="padding:9px 0;border-bottom:1px solid rgba(255,255,255,.05)">
+    <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:7px"><span style="color:var(--text)">${c.t}</span><b style="font-variant-numeric:tabular-nums">${c.v.toFixed(1)} min</b></div>
+    <div class="meter ${c.cls}"><i style="width:${Math.round(c.v/c.max*100)}%"></i></div>
+  </div>`).join('');
+</script>
+</body>
+</html>

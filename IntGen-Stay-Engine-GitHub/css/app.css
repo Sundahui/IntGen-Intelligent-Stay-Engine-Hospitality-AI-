@@ -1,0 +1,221 @@
+/* ============================================================
+   App shell - left nav + workspace canvas
+   Used by dashboard.html and module pages
+   ============================================================ */
+
+.app {
+  display: grid;
+  grid-template-columns: var(--nav-w) 1fr;
+  min-height: 100vh;
+}
+
+/* ---------- LEFT NAV ---------- */
+.nav {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  padding: 24px 18px;
+  background: rgba(8, 7, 5, 0.72);
+  backdrop-filter: blur(26px) saturate(140%);
+  border-right: 1px solid var(--glass-border);
+  z-index: 20;
+}
+.nav__brand {
+  display: flex; align-items: center; gap: 11px;
+  padding: 8px 10px 22px;
+  text-decoration: none;
+  border-bottom: 1px solid var(--glass-border);
+  margin-bottom: 18px;
+}
+.nav__section-label {
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+  padding: 14px 12px 8px;
+  font-weight: 600;
+}
+.nav__item {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  padding: 11px 12px;
+  border-radius: 12px;
+  color: var(--text-mid);
+  text-decoration: none;
+  font-size: 14.5px;
+  font-weight: 500;
+  margin-bottom: 3px;
+  transition: background .2s, color .2s;
+  position: relative;
+}
+.nav__item:hover { background: var(--glass-bg); color: var(--text-hi); }
+.nav__item.locked {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+.nav__item.locked:hover {
+  background: transparent;
+  color: var(--text-mid);
+}
+.nav__item.active {
+  color: var(--text-hi);
+  background: linear-gradient(90deg, rgba(181,138,87,0.18), rgba(181,138,87,0.03));
+}
+.nav__item.active::before {
+  content: ""; position: absolute; left: -18px; top: 50%; transform: translateY(-50%);
+  width: 3px; height: 22px; border-radius: 0 3px 3px 0;
+  background: var(--accent); box-shadow: 0 0 12px var(--accent);
+}
+.nav__item .ic { width: 20px; height: 20px; flex-shrink: 0; opacity: .9; }
+.nav__item .idx { margin-left: auto; font-family: var(--mono); font-size: 11px; color: var(--text-faint); }
+
+.nav__foot { margin-top: auto; padding-top: 16px; border-top: 1px solid var(--glass-border); }
+.nav__user { display: flex; align-items: center; gap: 11px; padding: 8px 10px; border-radius: 12px; }
+.nav__avatar { width: 34px; height: 34px; border-radius: 50%; background: linear-gradient(135deg, var(--accent-2), var(--accent-3)); display: grid; place-items: center; font-weight: 600; font-size: 14px; color: #0a0e1a; }
+.nav__user .meta { line-height: 1.25; }
+.nav__user .meta b { font-size: 13.5px; font-weight: 600; }
+.nav__user .meta span { font-size: 11.5px; color: var(--text-lo); }
+
+/* ---------- WORKSPACE CANVAS ---------- */
+.work {
+  position: relative;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+.work__topbar {
+  position: sticky;
+  top: 0;
+  z-index: 15;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 40px;
+  background: rgba(5,5,4,0.68);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--glass-border);
+}
+.work__crumbs { display: flex; align-items: center; gap: 10px; font-size: 13.5px; color: var(--text-lo); }
+.work__crumbs b { color: var(--text-hi); font-weight: 600; }
+.work__topbar-actions { display: flex; gap: 12px; align-items: center; }
+.iconbtn {
+  width: 40px; height: 40px; border-radius: 11px;
+  display: grid; place-items: center;
+  background: var(--glass-bg); border: 1px solid var(--glass-border);
+  color: var(--text-mid); cursor: pointer; transition: .2s;
+}
+.iconbtn:hover { color: var(--text-hi); border-color: var(--glass-border-strong); }
+
+.work__body { padding: 36px 40px 60px; max-width: 1500px; }
+
+/* page heading */
+.page-head { margin-bottom: 28px; }
+.page-head h1 { font-size: clamp(26px, 3vw, 38px); margin: 10px 0 8px; }
+.page-head p { color: var(--text-mid); font-size: 15px; max-width: 640px; }
+
+/* ---------- KPI cards ---------- */
+.kpi-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 18px; margin-bottom: 26px; }
+.kpi {
+  padding: 22px;
+  position: relative;
+  overflow: hidden;
+}
+.kpi::after {
+  content: ""; position: absolute; right: -30px; top: -30px;
+  width: 120px; height: 120px; border-radius: 50%;
+  background: radial-gradient(circle, var(--_glow, rgba(94,234,212,0.18)), transparent 70%);
+  pointer-events: none;
+}
+.kpi__label { font-size: 13px; color: var(--text-lo); display: flex; align-items: center; gap: 8px; margin-bottom: 14px; }
+.kpi__icn { width: 30px; height: 30px; border-radius: 9px; display: grid; place-items: center; background: var(--glass-bg-strong); }
+.kpi__val { font-size: 34px; font-weight: 600; letter-spacing: -0.02em; line-height: 1; }
+.kpi__val small { font-size: 18px; color: var(--text-mid); font-weight: 500; }
+.kpi__foot { margin-top: 14px; display: flex; align-items: center; gap: 8px; font-size: 12.5px; color: var(--text-lo); }
+
+/* ---------- panels ---------- */
+.panels { display: grid; grid-template-columns: 1.6fr 1fr; gap: 20px; }
+.panel { padding: 24px; }
+.panel__head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px; }
+.panel__head h3 { font-size: 17px; }
+.panel__head .sub { font-size: 12.5px; color: var(--text-lo); }
+
+/* mini bar/line viz (pure CSS, no chart lib) */
+.spark { display: flex; align-items: flex-end; gap: 6px; height: 120px; }
+.spark .bar { flex: 1; border-radius: 6px 6px 0 0; background: linear-gradient(180deg, var(--accent), rgba(181,138,87,0.15)); opacity: .85; transition: height 1s cubic-bezier(.2,.8,.2,1); }
+.spark .bar:hover { opacity: 1; }
+
+/* module list inside dashboard */
+.modlist { display: flex; flex-direction: column; gap: 4px; }
+.modrow { display: flex; align-items: center; gap: 14px; padding: 13px 12px; border-radius: 12px; text-decoration: none; color: inherit; transition: background .2s; }
+.modrow:hover { background: var(--glass-bg); }
+.modrow .mi { width: 38px; height: 38px; border-radius: 11px; display: grid; place-items: center; background: var(--glass-bg-strong); border: 1px solid var(--glass-border); font-family: var(--mono); font-size: 13px; font-weight: 600; color: var(--text-lo); }
+.modrow b { font-size: 14.5px; font-weight: 600; display: block; }
+.modrow span { font-size: 12.5px; color: var(--text-lo); }
+.modrow .st { margin-left: auto; }
+.modrow.locked {
+  opacity: 0.48;
+  cursor: not-allowed;
+}
+.modrow.locked:hover {
+  background: transparent;
+}
+.modrow.unlocked {
+  border: 1px solid rgba(181, 138, 87, 0.24);
+  background: linear-gradient(120deg, rgba(181,138,87,0.13), rgba(255,255,255,0.035));
+}
+
+.console-entry {
+  min-height: 270px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 18px;
+  padding: 22px 4px;
+}
+.console-entry h2 {
+  font-size: clamp(28px, 4vw, 52px);
+  color: var(--text-hi);
+}
+.console-entry p {
+  color: var(--text-mid);
+  max-width: 620px;
+  font-size: 16px;
+}
+
+/* ---------- empty / placeholder module ---------- */
+.placeholder {
+  min-height: 64vh;
+  display: grid;
+  place-items: center;
+  text-align: center;
+}
+.placeholder__inner { max-width: 560px; padding: 60px 40px; }
+.placeholder__glyph {
+  width: 92px; height: 92px; margin: 0 auto 26px;
+  border-radius: 24px;
+  display: grid; place-items: center;
+  background: var(--glass-bg-strong);
+  border: 1px solid var(--glass-border-strong);
+  box-shadow: var(--shadow-soft);
+  position: relative;
+}
+.placeholder__glyph::after {
+  content: ""; position: absolute; inset: -1px; border-radius: 24px;
+  background: linear-gradient(135deg, var(--accent), transparent 50%, var(--accent-3));
+  opacity: .25; z-index: -1; filter: blur(8px);
+}
+.placeholder h1 { font-size: 32px; margin-bottom: 14px; }
+.placeholder p { color: var(--text-mid); font-size: 15.5px; margin-bottom: 28px; }
+.placeholder .tags { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+
+@media (max-width: 1180px) {
+  .kpi-grid { grid-template-columns: repeat(2, 1fr); }
+  .panels { grid-template-columns: 1fr; }
+}
+@media (max-width: 860px) {
+  .app { grid-template-columns: 1fr; }
+  .nav { position: fixed; transform: translateX(-100%); transition: transform .3s; }
+  .nav.open { transform: none; }
+}

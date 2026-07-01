@@ -1,0 +1,1220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Aura — Live Security Command Center</title>
+<link rel="stylesheet" href="assets/theme.css" />
+<style>
+  .app {
+    grid-template-columns: 1fr 360px;
+    grid-template-rows: 60px 1fr auto;
+    grid-template-areas:
+      "topbar topbar"
+      ".      events"
+      "timeline timeline";
+    pointer-events: none;
+  }
+
+  .app > * {
+    pointer-events: auto;
+  }
+
+  .scene-bg {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    overflow: hidden;
+    pointer-events: auto;
+  }
+
+  .scene-bg::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    opacity: 0.45;
+    background-image:
+      linear-gradient(rgba(120,160,230,0.07) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(120,160,230,0.07) 1px, transparent 1px);
+    background-size: 52px 52px;
+    transform: perspective(900px) rotateX(58deg) scale(2);
+    transform-origin: center 60%;
+    mask-image: radial-gradient(circle at 52% 54%, #000 0%, transparent 66%);
+    -webkit-mask-image: radial-gradient(circle at 52% 54%, #000 0%, transparent 66%);
+  }
+
+  .scene-img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    filter:
+      drop-shadow(0 50px 70px rgba(0,0,0,0.65))
+      drop-shadow(0 0 70px rgba(79,140,255,0.18));
+    -webkit-user-drag: none;
+    user-select: none;
+  }
+
+  .scene-stage {
+    pointer-events: auto;
+    position: absolute;
+    left: 45%;
+    top: 50%;
+    width: min(78vw, 1280px);
+    aspect-ratio: 16 / 9;
+    transform:
+      translate(-50%, -50%)
+      perspective(1200px)
+      rotateX(var(--dragRotateX, 0deg))
+      rotateY(var(--dragRotateY, 0deg));
+    transform-style: preserve-3d;
+    transform-origin: center center;
+    transition: transform .08s linear;
+    cursor: grab;
+  }
+
+  .scene-stage.dragging {
+    cursor: grabbing;
+    transition: none;
+  }
+
+  .scene-overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    pointer-events: none;
+    transform: translateZ(12px);
+  }
+
+  .scene-img.swap {
+    opacity: 0;
+    transform: translate(-54%, -50%) scale(.97);
+  }
+
+  .center-hud {
+    position: fixed;
+    z-index: 8;
+    top: 96px;
+    left: 328px;
+    pointer-events: none;
+    transition: opacity .18s ease, transform .18s ease;
+  }
+
+  .center-hud > * {
+    pointer-events: auto;
+  }
+
+  .center-hud.hidden {
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(-8px);
+  }
+
+  .zone-switch {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 5px;
+    border-radius: 12px;
+    background: rgba(5, 9, 18, .72);
+    border: 1px solid rgba(150, 175, 220, .16);
+    backdrop-filter: blur(18px) saturate(130%);
+    -webkit-backdrop-filter: blur(18px) saturate(130%);
+    box-shadow: 0 10px 28px rgba(0,0,0,.42);
+  }
+
+  .zone-btn {
+    border: 0;
+    cursor: pointer;
+    padding: 8px 14px;
+    border-radius: 8px;
+    font: inherit;
+    font-size: 13px;
+    font-weight: 600;
+    color: rgba(234,240,252,.56);
+    background: transparent;
+    transition: .15s ease;
+    white-space: nowrap;
+  }
+
+  .zone-btn:hover {
+    color: rgba(234,240,252,.9);
+    background: rgba(255,255,255,.05);
+  }
+
+  .zone-btn.active {
+    color: #fff;
+    background: rgba(120, 150, 230, .28);
+  }
+
+  .zone-btn .zc {
+    font-size: 11px;
+    opacity: .7;
+    margin-left: 4px;
+  }
+
+  .map-selector {
+    width: 220px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 15px;
+    border-radius: 9px;
+    background: rgba(5, 9, 18, .72);
+    border: 1px solid rgba(150, 175, 220, .16);
+    backdrop-filter: blur(18px) saturate(130%);
+    -webkit-backdrop-filter: blur(18px) saturate(130%);
+    box-shadow: 0 10px 28px rgba(0,0,0,.42);
+    cursor: pointer;
+  }
+
+  .map-label {
+    color: rgba(234,240,252,.9);
+    font-size: 13.5px;
+    font-weight: 600;
+  }
+
+  .map-arrow {
+    color: rgba(234,240,252,.48);
+    font-size: 13px;
+  }
+
+  .scene-tag {
+    position: absolute;
+    transform: translate(-50%, -50%);
+    text-align: center;
+  }
+
+  .scene-tag .lab {
+    font-size: 11.5px;
+    font-weight: 600;
+    color: #fff;
+    letter-spacing: .4px;
+    text-shadow: 0 2px 10px rgba(0,0,0,.85);
+    white-space: nowrap;
+    padding: 4px 11px;
+    border-radius: 20px;
+    background: rgba(14,22,42,0.42);
+    border: 1px solid rgba(255,255,255,0.16);
+    backdrop-filter: blur(8px);
+  }
+
+  .scene-tag .sub {
+    font-size: 9.5px;
+    color: rgba(234,240,252,0.65);
+    margin-top: 4px;
+    text-shadow: 0 1px 6px rgba(0,0,0,.8);
+  }
+
+  .hotspot {
+    position: absolute;
+    transform: translate(-50%, -50%);
+    cursor: pointer;
+    pointer-events: auto;
+  }
+
+  .hotspot .ping {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    position: relative;
+    border: 2px solid rgba(255,255,255,0.5);
+  }
+
+  .hotspot .ping::after {
+    content: '';
+    position: absolute;
+    inset: -2px;
+    border-radius: 50%;
+    animation: ping 1.8s cubic-bezier(0,0,.2,1) infinite;
+  }
+
+  .hotspot.crit .ping {
+    background: #ff5c6c;
+    box-shadow: 0 0 14px #ff5c6c;
+  }
+
+  .hotspot.crit .ping::after {
+    box-shadow: 0 0 0 2px rgba(255,92,108,.6);
+  }
+
+  .hotspot.warn .ping {
+    background: #f5b942;
+    box-shadow: 0 0 14px #f5b942;
+  }
+
+  .hotspot.warn .ping::after {
+    box-shadow: 0 0 0 2px rgba(245,185,66,.6);
+  }
+
+  .hotspot.info .ping {
+    background: #4f8cff;
+    box-shadow: 0 0 14px #4f8cff;
+  }
+
+  .hotspot.info .ping::after {
+    box-shadow: 0 0 0 2px rgba(79,140,255,.6);
+  }
+
+  @keyframes ping {
+    0% { transform: scale(1); opacity: .9; }
+    100% { transform: scale(3.6); opacity: 0; }
+  }
+
+  .hotspot .tip {
+    position: absolute;
+    bottom: 22px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(14,22,42,0.88);
+    border: 1px solid var(--border-hi);
+    border-radius: 9px;
+    padding: 6px 11px;
+    font-size: 11px;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    transition: .18s;
+    backdrop-filter: blur(10px);
+    box-shadow: var(--shadow);
+  }
+
+  .hotspot:hover .tip {
+    opacity: 1;
+    transform: translateX(-50%) translateY(-3px);
+  }
+
+  .events-panel {
+    grid-area: events;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    overflow: hidden;
+    align-self: start;
+  }
+
+  .ev-head {
+    padding: 15px 16px 13px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .ev-head .row {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+  }
+
+  .ev-head h2 {
+    font-size: 14px;
+    font-weight: 600;
+  }
+
+  .ev-head .spacer {
+    flex: 1;
+  }
+
+  .ev-head .live-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 10.5px;
+    font-weight: 700;
+    padding: 3px 9px;
+    border-radius: 9px;
+    background: rgba(46,224,160,.14);
+    color: var(--green);
+  }
+
+  .ev-list {
+    flex: 0 1 auto;
+    overflow-y: auto;
+    padding: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+    max-height: calc(100vh - 300px);
+  }
+
+  .evcard {
+    border-radius: var(--radius-sm);
+    padding: 14px 16px;
+    cursor: pointer;
+    background: rgba(5,9,18,.42);
+    border: 1px solid rgba(150,175,220,.12);
+    transition: all .15s;
+  }
+
+  .evcard:hover {
+    border-color: var(--border-hi);
+    background: rgba(15,25,45,.58);
+    transform: translateX(-2px);
+  }
+
+  .evcard.sel {
+    border-color: var(--cyan);
+    box-shadow: 0 0 0 1px var(--cyan), 0 8px 24px rgba(0,0,0,.4);
+  }
+
+  .evcard .sevbar {
+    display: none;
+  }
+
+  .evcard .top {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+  }
+
+  .evcard .age {
+    margin-left: auto;
+    font-size: 10.5px;
+    color: var(--text-faint);
+  }
+
+  .evcard .ttl {
+    font-size: 15px;
+    font-weight: 600;
+    line-height: 1.4;
+    margin-top: 4px;
+    color: #eef4ff;
+  }
+
+  .ev-empty {
+    text-align: center;
+    color: var(--text-faint);
+    padding: 40px 20px;
+    font-size: 12.5px;
+  }
+    .timeline {
+    grid-area: timeline;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .tl-head {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 13px 18px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .tl-head .lbl {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--text-faint);
+    font-weight: 700;
+  }
+
+  .tl-head .evid {
+    font-size: 13px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+  }
+
+  .tl-head .evttl {
+    font-size: 12.5px;
+    color: var(--text-dim);
+  }
+
+  .tl-head .spacer {
+    flex: 1;
+  }
+
+  .tl-head .acts {
+    display: flex;
+    gap: 8px;
+  }
+
+  .tl-body {
+    padding: 4px 8px;
+  }
+
+  .tl-empty {
+    text-align: center;
+    color: var(--text-faint);
+    padding: 26px;
+    font-size: 12.5px;
+  }
+
+  .tl-track {
+    display: flex;
+    align-items: stretch;
+    padding: 18px 14px 16px;
+    gap: 0;
+    overflow-x: auto;
+  }
+
+  .tl-step {
+    flex: 1;
+    min-width: 150px;
+    position: relative;
+    padding: 0 6px;
+  }
+
+  .tl-step .connector {
+    position: absolute;
+    top: 13px;
+    left: 50%;
+    right: -50%;
+    height: 2px;
+    background: rgba(255,255,255,.1);
+    z-index: 0;
+  }
+
+  .tl-step.done .connector {
+    background: var(--green);
+  }
+
+  .tl-step.active .connector {
+    background: linear-gradient(90deg,var(--accent),rgba(255,255,255,.1));
+  }
+
+  .tl-step:last-child .connector {
+    display: none;
+  }
+
+  .tl-node {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    font-size: 12px;
+    font-weight: 700;
+    position: relative;
+    z-index: 1;
+    margin-bottom: 11px;
+    background: rgba(28,40,66,0.9);
+    border: 1px solid var(--border);
+    color: var(--text-faint);
+  }
+
+  .tl-step.done .tl-node {
+    background: var(--green);
+    color: #06281c;
+    border-color: var(--green);
+    box-shadow: 0 0 14px rgba(46,224,160,.45);
+  }
+
+  .tl-step.active .tl-node {
+    background: var(--accent);
+    color: #fff;
+    border-color: var(--accent);
+    box-shadow: 0 0 14px rgba(79,140,255,.55);
+    animation: pulse2 1.6s infinite;
+  }
+
+  @keyframes pulse2 {
+    0%,100% { box-shadow: 0 0 0 0 rgba(79,140,255,.5); }
+    50% { box-shadow: 0 0 0 7px rgba(79,140,255,0); }
+  }
+
+  .tl-step .stg-lbl {
+    font-size: 9.5px;
+    text-transform: uppercase;
+    letter-spacing: .7px;
+    color: var(--text-faint);
+    font-weight: 700;
+  }
+
+  .tl-step.active .stg-lbl {
+    color: #9bbcff;
+  }
+
+  .tl-step.done .stg-lbl {
+    color: #7af0c4;
+  }
+
+  .tl-step .stg-head {
+    font-size: 12.5px;
+    font-weight: 600;
+    margin-top: 3px;
+    line-height: 1.3;
+  }
+
+  .tl-step .stg-text {
+    font-size: 11px;
+    color: var(--text-dim);
+    margin-top: 5px;
+    line-height: 1.45;
+    display: -webkit-box;
+    -webkit-line-clamp: 4;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .tl-step .stg-extra {
+    margin-top: 8px;
+  }
+
+  .mini-imp {
+    font-size: 10.5px;
+    color: var(--text-dim);
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 3px 0;
+    border-bottom: 1px solid rgba(255,255,255,.05);
+  }
+
+  .mini-imp b {
+    color: var(--text);
+    font-weight: 600;
+    text-align: right;
+  }
+
+  .mini-rec {
+    display: flex;
+    gap: 7px;
+    align-items: flex-start;
+    font-size: 10.5px;
+    color: var(--text-dim);
+    padding: 4px 0;
+  }
+
+  .mini-rec .n {
+    width: 15px;
+    height: 15px;
+    border-radius: 50%;
+    background: var(--accent);
+    color: #fff;
+    display: grid;
+    place-items: center;
+    font-size: 9px;
+    font-weight: 700;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  .voice-notice {
+    position: relative;
+    z-index: 3;
+    width: auto;
+    max-height: 0;
+    margin: 0 8px;
+    border-radius: 14px;
+    background: linear-gradient(180deg, rgba(8,12,24,.92), rgba(5,8,16,.82));
+    border: 1px solid rgba(150,175,220,.22);
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,.08),
+      0 22px 54px rgba(0,0,0,.55);
+    backdrop-filter: blur(22px) saturate(130%);
+    -webkit-backdrop-filter: blur(22px) saturate(130%);
+    transform: translateY(-18px);
+    opacity: 0;
+    pointer-events: none;
+    transition:
+      max-height .42s cubic-bezier(.2,.9,.2,1),
+      margin .42s cubic-bezier(.2,.9,.2,1),
+      transform .42s cubic-bezier(.2,.9,.2,1),
+      opacity .26s ease;
+    overflow: hidden;
+  }
+
+  .voice-notice.show {
+    max-height: 280px;
+    margin: 8px 8px 0;
+    transform: translateY(0);
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .voice-notice .vn-head {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    padding: 14px 15px 12px;
+    border-bottom: 1px solid rgba(150,175,220,.13);
+  }
+
+  .voice-notice .vn-orb {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    background: linear-gradient(135deg, var(--accent), var(--accent-2));
+    box-shadow: 0 0 22px rgba(79,140,255,.28);
+    font-weight: 700;
+  }
+
+  .voice-notice .vn-title {
+    font-size: 13.5px;
+    font-weight: 700;
+    color: #fff;
+  }
+
+  .voice-notice .vn-meta {
+    font-size: 11px;
+    color: rgba(234,240,252,.58);
+    margin-top: 2px;
+  }
+
+  .voice-notice .vn-wave {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    height: 24px;
+  }
+
+  .voice-notice .vn-wave i {
+    width: 3px;
+    border-radius: 4px;
+    background: var(--cyan);
+    animation: vw 1s ease-in-out infinite;
+  }
+
+  .voice-notice .vn-body {
+    padding: 13px 15px 15px;
+  }
+
+  .voice-notice .vn-script {
+    color: rgba(234,240,252,.9);
+    font-size: 12.5px;
+    line-height: 1.55;
+  }
+
+  .voice-notice .vn-footer {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 12px;
+    color: rgba(234,240,252,.55);
+    font-size: 11px;
+  }
+</style>
+</head>
+
+<body>
+
+<div class="scene-bg">
+  <div class="scene-stage" id="sceneStage">
+    <img class="scene-img" id="sceneImg" src="assets/hotel-isometric-map.png" alt="3D hotel scene" />
+
+    <div class="scene-overlay">
+      <div id="sceneTags"></div>
+      <div id="sceneHotspots"></div>
+    </div>
+  </div>
+</div>
+
+<div class="center-hud hidden" id="mapSwitcher">
+  <div class="zone-switch glass">
+    <button class="zone-btn active" data-zone="lobby">Public Areas <span class="zc" id="zt-lobby">0</span></button>
+    <button class="zone-btn" data-zone="fnb">F&amp;B <span class="zc" id="zt-fnb">0</span></button>
+    <button class="zone-btn" data-zone="rooms">Guest Floors <span class="zc" id="zt-rooms">0</span></button>
+  </div>
+  <div class="map-selector glass" style="display:none">
+    <span class="map-label">Lobby & Public Areas</span>
+    <span class="map-arrow">▼</span>
+  </div>
+</div>
+
+<div class="app">
+  <aside class="sidebar glass"></aside>
+  <header class="topbar glass" data-crumb="Live Surveillance"></header>
+
+  <section class="events-panel glass">
+    <div class="ev-head">
+      <div class="row">
+        <h2>Zone Incidents</h2>
+        <span class="spacer"></span>
+        <span class="live-chip">
+          <span class="dot live"></span>
+          <span id="evLiveCount">0</span> active
+        </span>
+      </div>
+    </div>
+
+    <div class="ev-list" id="evList"></div>
+  </section>
+
+  <section class="timeline glass">
+    <div class="tl-head">
+      <span class="lbl">Lifecycle Timeline</span>
+      <span class="evid" id="tlEvId">—</span>
+      <span class="evttl" id="tlEvTtl">Select an event to view the complete lifecycle</span>
+      <span class="spacer"></span>
+      <div class="acts" id="tlActs"></div>
+    </div>
+
+    <div class="tl-body" id="tlBody">
+      <div class="tl-empty">Select an event to view the complete lifecycle.</div>
+    </div>
+  </section>
+</div>
+
+<script>
+window.AURA_PAGE = 'live';
+</script>
+
+<script src="assets/data.js"></script>
+<script src="assets/shell.js"></script>
+
+<script>
+const STAGES = [
+  'Triggered',
+  'Analyzing',
+  'Impact',
+  'Recommended',
+  'Assigned',
+  'Escalated',
+  'Resolved'
+];
+
+const ZONES = {
+  lobby: {
+    name: 'Lobby & Public Areas',
+    icon: '',
+    color: 'var(--accent)',
+    meta: 'Entrances lobby BOH doors public-area cameras',
+    img: 'assets/hotel-isometric-map.png',
+    tags: [
+      { x: 30, y: 42, lab: 'Main Entrance', sub: 'Access Point' },
+      { x: 58, y: 34, lab: 'BOH Service Door', sub: 'Access Control' },
+      { x: 48, y: 66, lab: 'Lobby Lounge', sub: 'Public Area' }
+    ]
+  },
+
+  fnb: {
+    name: 'F&B & Leisure',
+    icon: '',
+    color: 'var(--cyan)',
+    meta: 'Restaurants bars spa crowd-density cameras',
+    img: 'assets/fnb-map.png?v=2',
+    tags: [
+      { x: 26, y: 60, lab: 'Lounge Entrance', sub: 'Crowd Density' },
+      { x: 64, y: 16, lab: 'Bar / Buffet', sub: 'Public Area' }
+    ]
+  },
+
+  rooms: {
+    name: 'Guest Floors',
+    icon: '',
+    color: 'var(--accent-2)',
+    meta: 'Guest floors stairwell doors access control patrols',
+    img: 'assets/guest-floors-map.png?v=2',
+    tags: [
+      { x: 8, y: 28, lab: 'Stairwell Door', sub: 'Access Control' },
+      { x: 80, y: 18, lab: 'Emergency Exit', sub: 'Life Safety' }
+    ]
+  }
+};
+
+const EVENTS = AURA_EVENTS;
+
+let currentZone = 'lobby';
+let selectedId = null;
+let feedOn = true;
+
+const $ = s => document.querySelector(s);
+
+const evByZone = z => EVENTS.filter(e => e.zone === z);
+const activeCount = list => list.filter(e => e.stage < 6).length;
+
+function updateCounts() {
+  ['lobby', 'fnb', 'rooms'].forEach(z => {
+    const n = activeCount(evByZone(z));
+    const zt = $('#zt-' + z);
+    if (zt) zt.textContent = n;
+  });
+}
+
+function renderScene(animate) {
+  const Z = ZONES[currentZone];
+
+  const mapTitle = $('#mapTitle');
+  const mapZIcon = $('#mapZIcon');
+  const mapMeta = $('#mapMeta');
+  const mapLabel = $('.map-label');
+
+  if (mapTitle) mapTitle.innerHTML = Z.name;
+  if (mapZIcon) mapZIcon.textContent = Z.icon;
+  if (mapMeta) mapMeta.textContent = Z.meta;
+  if (mapLabel) mapLabel.textContent = Z.name;
+
+  const img = $('#sceneImg');
+
+  if (animate) {
+    img.classList.add('swap');
+    setTimeout(() => {
+      img.src = Z.img;
+      img.classList.remove('swap');
+    }, 220);
+  } else {
+    img.src = Z.img;
+  }
+
+  $('#sceneTags').innerHTML = (Z.tags || []).map(t => `
+    <div class="scene-tag" style="left:${t.x}%;top:${t.y}%">
+      <div class="lab">${t.lab}</div>
+      ${t.sub ? `<div class="sub">${t.sub}</div>` : ''}
+    </div>
+  `).join('');
+
+  $('#sceneHotspots').innerHTML = evByZone(currentZone)
+    .filter(e => e.stage < 6)
+    .map(e => `
+      <div class="hotspot ${e.sev}"
+           style="left:${e.pos.x}%;top:${e.pos.y}%"
+           onclick="selectEvent('${e.id}')">
+        <div class="ping"></div>
+        <div class="tip">${e.id}</div>
+      </div>
+    `).join('');
+}
+
+function evCard(e) {
+  return `
+    <div class="evcard ${e.id === selectedId ? 'sel' : ''}"
+         onclick="selectEvent('${e.id}')">
+
+      <div class="top">
+        <span class="age">${e.age}</span>
+      </div>
+
+      <div class="ttl">${e.title}</div>
+    </div>
+  `;
+}
+
+function renderEvents() {
+  const list = evByZone(currentZone);
+  $('#evLiveCount').textContent = activeCount(list);
+
+  const o = { crit: 0, warn: 1, info: 2 };
+
+  const sorted = [...list].sort((a, b) =>
+    (a.stage < 6 ? 0 : 1) - (b.stage < 6 ? 0 : 1) ||
+    o[a.sev] - o[b.sev]
+  );
+
+  $('#evList').innerHTML = sorted.length
+    ? sorted.map(evCard).join('')
+    : `<div class="ev-empty">No active events in this zone.</div>`;
+}
+function renderTimeline() {
+  const e = EVENTS.find(x => x.id === selectedId);
+
+  if (!e) {
+    $('#tlEvId').textContent = '—';
+    $('#tlEvTtl').textContent = 'Select an event to view the complete lifecycle';
+    $('#tlActs').innerHTML = '';
+    $('#tlBody').innerHTML = `
+      <div class="tl-empty">Select an event to view the complete lifecycle.</div>
+    `;
+    return;
+  }
+
+  const f = e.flow;
+
+  $('#tlEvId').innerHTML = `${e.id}`;
+  $('#tlEvTtl').textContent = e.title;
+
+  $('#tlActs').innerHTML = `
+    <button class="btn primary sm" onclick="approveActions('${e.id}')">
+      Approve Actions
+    </button>
+    <button class="btn sm" onclick="dispatchVoiceAI('${e.id}')">
+      Voice AI
+    </button>
+  `;
+
+  const impactHtml = `
+    <div class="stg-extra">
+      ${f.impact.map(i => `
+        <div class="mini-imp">
+          <span>${i.l}</span>
+          <b>${i.v}</b>
+        </div>
+      `).join('')}
+    </div>
+  `;
+
+  const recHtml = `
+    <div class="stg-extra">
+      ${f.recs.map((r, i) => `
+        <div class="mini-rec">
+          <span class="n">${i + 1}</span>
+          <span>
+            ${r.t}
+            <span style="color:var(--text-faint)">${r.c}</span>
+          </span>
+        </div>
+      `).join('')}
+    </div>
+  `;
+
+  const defs = [
+    {
+      lbl: 'Trigger',
+      head: 'Detected',
+      text: f.trigger
+    },
+    {
+      lbl: 'Analysis',
+      head: 'System Check',
+      text: f.analysis
+    },
+    {
+      lbl: 'Impact',
+      head: f.impactTtl,
+      extra: impactHtml
+    },
+    {
+      lbl: 'Actions',
+      head: 'Recommended Actions',
+      extra: recHtml
+    },
+    {
+      lbl: 'Assignment',
+      head: 'Owner ' + e.owner,
+      text: 'Task routed to the owning department.'
+    },
+    {
+      lbl: 'Escalation',
+      head: e.escIn === 'Resolved' ? 'No Escalation Needed' : 'On Track',
+      text: e.escIn === 'Resolved'
+        ? 'The event has been closed.'
+        : 'Owner responding within SLA.'
+    },
+    {
+      lbl: 'Resolution',
+      head: e.stage >= 6 ? 'Resolved' : 'Pending',
+      text: e.stage >= 6
+        ? 'Outcome recorded for analytics.'
+        : 'Resolution is still in progress.'
+    }
+  ];
+
+  const steps = defs.map((d, i) => ({
+    ...d,
+    state: i < e.stage ? 'done' : (i === e.stage ? 'active' : 'pending'),
+    node: i + 1
+  }));
+
+  $('#tlBody').innerHTML = `
+    <div class="tl-track">
+      ${steps.map(s => `
+        <div class="tl-step ${s.state}">
+          <div class="connector"></div>
+          <div class="tl-node">${s.state === 'done' ? '✓' : s.node}</div>
+          <div class="stg-lbl">${s.lbl}</div>
+          <div class="stg-head">${s.head}</div>
+          ${s.text ? `<div class="stg-text">${s.text}</div>` : ''}
+          ${s.extra || ''}
+        </div>
+      `).join('')}
+    </div>
+  `;
+}
+
+function renderAll(anim) {
+  updateCounts();
+  renderScene(anim);
+  renderEvents();
+  renderTimeline();
+}
+
+function switchZone(z) {
+  if (z === currentZone) return;
+
+  currentZone = z;
+
+  const sel = EVENTS.find(e => e.id === selectedId);
+  if (!sel || sel.zone !== z) selectedId = null;
+
+  document.querySelectorAll('.zone-btn').forEach(b => {
+    b.classList.toggle('active', b.dataset.zone === z);
+  });
+
+  renderAll(true);
+}
+
+function selectEvent(id) {
+  const e = EVENTS.find(x => x.id === id);
+
+  if (e && e.zone !== currentZone) {
+    currentZone = e.zone;
+
+    document.querySelectorAll('.zone-btn').forEach(b => {
+      b.classList.toggle('active', b.dataset.zone === e.zone);
+    });
+  }
+
+  selectedId = id;
+  renderAll(true);
+}
+
+function approveActions(id) {
+  const e = EVENTS.find(x => x.id === id);
+
+  if (e && e.stage < 5) {
+    e.stage = 5;
+  }
+
+  renderAll();
+  window.toast(`Actions approved for ${id}`);
+}
+
+function ownerContact(e) {
+  if (e.owner === 'Security') return 'Daniel Wong, Owner Security';
+  if (e.owner === 'Duty Manager') return 'Priya Nair, Duty Manager';
+  return `${e.owner} Lead`;
+}
+
+function voiceScript(e, contact) {
+  const zone = ZONES[e.zone] ? ZONES[e.zone].name : 'the property';
+
+  return `Hi ${contact.split(',')[0]}, this is Aura Voice AI calling from the Sunway Intelligence Command Center. We detected ${e.title.toLowerCase()} in ${zone}. ${e.flow.trigger} I am calling to confirm what situation you are seeing on the ground and whether you need immediate support dispatched. Can you briefly describe your current status?`;
+}
+
+function speakVoiceScript(text) {
+  if (!('speechSynthesis' in window)) return;
+
+  window.speechSynthesis.cancel();
+
+  const utterance = new SpeechSynthesisUtterance(text);
+  utterance.lang = 'en-US';
+  utterance.rate = 0.94;
+  utterance.pitch = 1;
+  window.speechSynthesis.speak(utterance);
+}
+
+function dispatchVoiceAI(id) {
+  const e = EVENTS.find(x => x.id === id);
+  if (!e) return;
+
+  const contact = ownerContact(e);
+  const script = voiceScript(e, contact);
+
+  let panel = document.getElementById('voiceNotice');
+  if (!panel) {
+    panel = document.createElement('div');
+    panel.className = 'voice-notice';
+    panel.id = 'voiceNotice';
+  }
+
+  const eventsPanel = document.querySelector('.events-panel');
+  if (eventsPanel && panel.parentElement !== eventsPanel) {
+    eventsPanel.prepend(panel);
+  }
+
+  panel.innerHTML = `
+    <div class="vn-head">
+      <div class="vn-orb">AI</div>
+      <div>
+        <div class="vn-title">Voice AI calling ${contact}</div>
+        <div class="vn-meta">${e.id} · ${e.owner} · ${e.age}</div>
+      </div>
+      <div class="vn-wave" aria-hidden="true">
+        ${[8,16,11,22,9,18,12].map((h, i) => `<i style="height:${h}px;animation-delay:${i * .08}s"></i>`).join('')}
+      </div>
+    </div>
+    <div class="vn-body">
+      <div class="vn-script">${script}</div>
+      <div class="vn-footer">
+        <span class="dot live"></span>
+        <span>Outbound call in progress</span>
+      </div>
+    </div>
+  `;
+
+  requestAnimationFrame(() => panel.classList.add('show'));
+  speakVoiceScript(script);
+}
+
+let advanceTimer;
+
+function advanceLifecycle() {
+  const fp = document.getElementById('feedPill');
+  feedOn = fp ? fp.textContent.includes('On') : true;
+
+  if (!feedOn) return;
+
+  const open = EVENTS.filter(e => e.stage < 6 && e.escIn !== 'Monitoring');
+  if (!open.length) return;
+
+  const e = open[Math.floor((Date.now() / 4000) % open.length)] || open[0];
+
+  e.stage++;
+
+  if (e.stage === 6) {
+    e.escIn = 'Resolved';
+    window.toast(`${e.id} resolved`);
+  } else if (e.stage === 5) {
+    window.toast(`${e.id} escalated`);
+  }
+
+  renderAll();
+}
+
+document.querySelectorAll('.zone-btn').forEach(el => {
+  el.addEventListener('click', () => switchZone(el.dataset.zone));
+});
+
+const hash = (location.hash || '').replace('#', '');
+
+if (['lobby', 'fnb', 'rooms'].includes(hash)) {
+  currentZone = hash;
+}
+
+document.querySelectorAll('.zone-btn').forEach(b => {
+  b.classList.toggle('active', b.dataset.zone === currentZone);
+});
+
+renderAll();
+
+const sceneStage = document.getElementById('sceneStage');
+
+let isDraggingScene = false;
+let startX = 0;
+let startY = 0;
+let currentRotateX = 0;
+let currentRotateY = 0;
+let baseRotateX = 0;
+let baseRotateY = 0;
+
+if (sceneStage) {
+  sceneStage.addEventListener('mousedown', e => {
+    isDraggingScene = true;
+    startX = e.clientX;
+    startY = e.clientY;
+    baseRotateX = currentRotateX;
+    baseRotateY = currentRotateY;
+    sceneStage.classList.add('dragging');
+  });
+
+  window.addEventListener('mousemove', e => {
+    if (!isDraggingScene) return;
+
+    const deltaX = e.clientX - startX;
+    const deltaY = e.clientY - startY;
+
+    currentRotateY = baseRotateY + deltaX * 0.08;
+    currentRotateX = baseRotateX - deltaY * 0.08;
+
+    currentRotateX = Math.max(-18, Math.min(18, currentRotateX));
+    currentRotateY = Math.max(-22, Math.min(22, currentRotateY));
+
+    sceneStage.style.setProperty('--dragRotateX', `${currentRotateX}deg`);
+    sceneStage.style.setProperty('--dragRotateY', `${currentRotateY}deg`);
+  });
+
+  window.addEventListener('mouseup', () => {
+    isDraggingScene = false;
+    sceneStage.classList.remove('dragging');
+  });
+}
+</script>
+
+<script src="../../assets/back-home.js" data-home="../../index.html"></script>
+</body>
+</html>

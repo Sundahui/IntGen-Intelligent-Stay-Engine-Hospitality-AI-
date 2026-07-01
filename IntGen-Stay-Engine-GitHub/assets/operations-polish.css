@@ -1,0 +1,70 @@
+html,
+body {
+  overflow: hidden;
+}
+
+#root {
+  padding-left: 0 !important;
+}
+
+#console-rail,
+#ig-home {
+  display: none !important;
+}
+
+main.relative.h-screen {
+  width: 100vw;
+}
+
+main.relative.h-screen > header {
+  min-height: 72px;
+  padding-left: 28px !important;
+  padding-right: 28px !important;
+}
+
+main.relative.h-screen > section.grid:first-of-type {
+  grid-template-columns: minmax(690px, 0.58fr) minmax(520px, 0.42fr) !important;
+  gap: 28px !important;
+  padding: 22px 28px 0 !important;
+  align-items: start;
+}
+
+main.relative.h-screen > section.grid:first-of-type > section.relative {
+  min-height: 640px;
+}
+
+.node-card {
+  transform: scale(0.9);
+  transform-origin: center;
+}
+
+.node-card h3 {
+  font-size: 13px !important;
+}
+
+.node-card [class*="text-["] {
+  line-height: 1.05;
+}
+
+main.relative.h-screen > section.grid:first-of-type > aside {
+  display: grid;
+  gap: 20px !important;
+}
+
+main.relative.h-screen > section.grid:first-of-type > aside > section {
+  padding: 18px !important;
+}
+
+main.relative.h-screen > section.grid:first-of-type > aside article {
+  min-width: 0;
+}
+
+@media (max-width: 1180px) {
+  main.relative.h-screen > section.grid:first-of-type {
+    grid-template-columns: 1fr !important;
+  }
+
+  main.relative.h-screen > section.grid:first-of-type > aside {
+    max-width: none;
+  }
+}

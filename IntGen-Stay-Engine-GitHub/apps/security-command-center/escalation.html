@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Aura — Escalation Matrix</title>
+<link rel="stylesheet" href="assets/theme.css" />
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar glass"></aside>
+  <header class="topbar glass" data-crumb="Escalation Matrix"></header>
+
+  <section class="view glass">
+    <div class="view-head">
+      <div>
+        <h2>Escalation Matrix</h2>
+      </div>
+      <div class="vh-acts">
+        <button class="btn sm" onclick="window.toast('Opened SLA policy editor')">Edit policy</button>
+        <button class="btn primary sm" onclick="window.toast('Escalation rules published')">Publish rules</button>
+      </div>
+    </div>
+
+    <div class="view-body">
+      <div class="kpi-row">
+        <div class="kpi k-amber"><div class="kl">Active escalations</div><div class="kv" id="k-esc">0</div><div class="kd">timers armed now</div></div>
+        <div class="kpi k-red"><div class="kl">Breaching &lt; 10 min</div><div class="kv">1</div><div class="kd">EV-2044 life-safety</div></div>
+        <div class="kpi k-green"><div class="kl">SLA adherence (24h)</div><div class="kv">98.2<span style="font-size:14px">%</span></div><div class="kd"><span class="up">+1.4pt</span></div></div>
+        <div class="kpi k-cyan"><div class="kl">Avg ack time</div><div class="kv">3:12</div><div class="kd">before tier-2</div></div>
+      </div>
+
+      <div class="grid-2">
+        <div class="sec">
+          <div class="sec-title">Live escalation - EV-2044 · Fire pre-alarm <span class="st-meta">tier 2 of 4</span></div>
+          <div class="card">
+            <div class="ladder">
+              <div class="rung r-done"><div class="lv">1</div><div class="rbody"><div class="rt">Owner - Security on duty</div><div class="rs">Auto-assigned at trigger · acknowledged in 0:24</div></div><div class="rtime">10:41:02</div></div>
+              <div class="rung r-now"><div class="lv">2</div><div class="rbody"><div class="rt">Duty Manager <span class="chip c-wait"><span class="cdot"></span>Voice AI calling</span></div><div class="rs">Immediate tier for life-safety — call in progress</div></div><div class="rtime">+0:00</div></div>
+              <div class="rung"><div class="lv">3</div><div class="rbody"><div class="rt">Chief Engineer + GM</div><div class="rs">Arms if unacknowledged in 3 min</div></div><div class="rtime">in 2:48</div></div>
+              <div class="rung"><div class="lv">4</div><div class="rbody"><div class="rt">Emergency services protocol</div><div class="rs">Manual confirm required - primed, on hold</div></div><div class="rtime">on hold</div></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="sec">
+          <div class="sec-title">Other armed timers</div>
+          <div class="card" style="padding:6px 8px">
+            <table class="dtable">
+              <thead><tr><th>Event</th><th>Current owner</th><th>Next tier</th><th>Fires in</th></tr></thead>
+              <tbody>
+                <tr><td><b class="strong">EV-2041</b> · VIP arrival</td><td>Front Office</td><td>Duty Manager</td><td><span class="chip c-wait"><span class="cdot"></span>14:32</span></td></tr>
+                <tr><td><b class="strong">EV-2035</b> · Chiller fault</td><td>Engineering</td><td>Chief Engineer</td><td><span class="chip c-wait"><span class="cdot"></span>08:10</span></td></tr>
+                <tr><td><b class="strong">EV-2031</b> · Guest complaint</td><td>Guest Relations</td><td>GR Manager</td><td><span class="chip c-wait"><span class="cdot"></span>04:55</span></td></tr>
+                <tr><td><b class="strong">EV-2043</b> · Spa conflict</td><td>Spa</td><td>Spa Manager</td><td><span class="chip c-wait"><span class="cdot"></span>03:21</span></td></tr>
+                <tr><td><b class="strong">EV-2038</b> · Queue spike</td><td>Front Office</td><td>-</td><td><span class="chip c-live"><span class="cdot"></span>On track</span></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div class="sec">
+        <div class="sec-title">Escalation policy by event class</div>
+        <div class="card" style="padding:6px 8px">
+          <table class="dtable">
+            <thead><tr><th>Event class</th><th>Tier 1 (owner)</th><th>Tier 2</th><th>Tier 3</th><th>SLA to ack</th><th>Voice AI</th></tr></thead>
+            <tbody>
+              <tr><td><span class="tag crit">Life-safety</span></td><td><b class="strong">Security</b></td><td>Duty Manager</td><td>Chief Eng. + GM</td><td class="mono">Immediate</td><td><span class="chip c-vio"><span class="cdot"></span>Auto-call</span></td></tr>
+              <tr><td><span class="tag crit">VIP / Revenue</span></td><td><b class="strong">Front Office</b></td><td>Duty Manager</td><td>GM</td><td class="mono">15 min</td><td><span class="chip c-vio"><span class="cdot"></span>Auto-call</span></td></tr>
+              <tr><td><span class="tag warn">Facility</span></td><td><b class="strong">Engineering</b></td><td>Chief Engineer</td><td>Duty Manager</td><td class="mono">10 min</td><td><span class="chip c-info"><span class="cdot"></span>On no-ack</span></td></tr>
+              <tr><td><span class="tag warn">Guest service</span></td><td><b class="strong">Guest Relations</b></td><td>GR Manager</td><td>Duty Manager</td><td class="mono">5 min</td><td><span class="chip c-info"><span class="cdot"></span>On no-ack</span></td></tr>
+              <tr><td><span class="tag info">Capacity / F&amp;B</span></td><td><b class="strong">Dept. lead</b></td><td>Duty Manager</td><td>-</td><td class="mono">Monitor</td><td><span class="chip c-mute"><span class="cdot"></span>Manual</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<script>window.AURA_PAGE='escalation';</script>
+<script src="assets/data.js"></script>
+<script src="assets/shell.js"></script>
+<script>
+document.getElementById('k-esc').textContent = AURA_EVENTS.filter(e=>e.escIn.includes('→')).length;
+</script>
+</body>
+</html>

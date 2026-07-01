@@ -1,0 +1,149 @@
+/* ============================================================
+   console-rail.css
+   A collapsed icon-rail sidebar overlaid on the Demand Forecasting
+   console (operations / lobby). It does NOT touch the React app's
+   layout — it sits fixed on top and expands on hover so you can
+   always click back to the Dashboard module overview.
+   Visual tokens mirror the dashboard nav (css/app.css + design-system).
+   ============================================================ */
+
+:root {
+  --rail-w: 64px;
+  --rail-w-open: 248px;
+}
+
+/* Reserve the collapsed rail's width so the React canvas is never hidden
+   behind it. The rail expands ON TOP of the content on hover (overlay), so
+   opening it does not reflow the app. */
+#root {
+  padding-left: var(--rail-w);
+  box-sizing: border-box;
+}
+/* The AI-insight panel is pinned to the right edge — leave it alone. */
+
+#console-rail {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100vh;
+  width: var(--rail-w);
+  display: flex;
+  flex-direction: column;
+  padding: 18px 12px;
+  gap: 4px;
+  background: rgba(8, 7, 5, 0.82);
+  -webkit-backdrop-filter: blur(26px) saturate(140%);
+  backdrop-filter: blur(26px) saturate(140%);
+  border-right: 1px solid rgba(255, 255, 255, 0.10);
+  z-index: 2147483000;          /* above the React canvas */
+  overflow: hidden;
+  transition: width .26s cubic-bezier(.4, 0, .2, 1);
+  box-sizing: border-box;
+  font-family: inherit;
+}
+#console-rail:hover,
+#console-rail.is-open {
+  width: var(--rail-w-open);
+  box-shadow: 0 0 60px rgba(0, 0, 0, 0.55);
+}
+
+/* brand / collapse toggle */
+#console-rail .rail__brand {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding: 6px 8px 16px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.10);
+  margin-bottom: 10px;
+  text-decoration: none;
+  flex-shrink: 0;
+}
+#console-rail .rail__brand img {
+  width: 30px;
+  height: 30px;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+
+/* generic row */
+#console-rail .rail__item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 11px 11px;
+  border-radius: 12px;
+  color: rgba(245, 248, 255, 0.72);
+  text-decoration: none;
+  font-size: 14.5px;
+  font-weight: 500;
+  white-space: nowrap;
+  transition: background .2s, color .2s;
+  position: relative;
+}
+#console-rail .rail__item:hover {
+  background: rgba(255, 255, 255, 0.04);
+  color: #f5f8ff;
+}
+#console-rail .rail__item.locked {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+#console-rail .rail__item.locked:hover {
+  background: transparent;
+  color: rgba(245, 248, 255, 0.72);
+}
+#console-rail .rail__item.active {
+  color: #f5f8ff;
+  background: linear-gradient(90deg, rgba(181, 138, 87, 0.18), rgba(181, 138, 87, 0.03));
+}
+#console-rail .rail__item.active::before {
+  content: "";
+  position: absolute; left: -12px; top: 50%; transform: translateY(-50%);
+  width: 3px; height: 22px; border-radius: 0 3px 3px 0;
+  background: #d4bf8b; box-shadow: 0 0 12px #d4bf8b;
+}
+
+/* fixed-width glyph keeps icons aligned in the collapsed rail */
+#console-rail .rail__ic {
+  width: 22px;
+  text-align: center;
+  flex-shrink: 0;
+  font-size: 16px;
+  line-height: 1;
+}
+#console-rail .rail__num {
+  margin-left: auto;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 11px;
+  color: rgba(245, 248, 255, 0.28);
+}
+
+/* labels: hidden when collapsed, fade in when the rail opens */
+#console-rail .rail__label,
+#console-rail .rail__num,
+#console-rail .rail__section {
+  opacity: 0;
+  transition: opacity .18s;
+  pointer-events: none;
+}
+#console-rail:hover .rail__label,
+#console-rail.is-open .rail__label,
+#console-rail:hover .rail__num,
+#console-rail.is-open .rail__num,
+#console-rail:hover .rail__section,
+#console-rail.is-open .rail__section {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+#console-rail .rail__section {
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(245, 248, 255, 0.28);
+  padding: 14px 11px 6px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+#console-rail .rail__spacer { flex: 1; }
