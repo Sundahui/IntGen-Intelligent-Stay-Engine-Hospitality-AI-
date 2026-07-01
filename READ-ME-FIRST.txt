@@ -1,0 +1,40 @@
+IntGen Stay Intelligence Engine
+SUNWAY IntGen · Hospitality AI Platform
+========================================
+
+WHAT THIS IS
+------------
+One landing page that opens into three standalone intelligence products:
+
+  1. Intelligent Demand Forecasting  — lobby & venue occupancy, demand forecasts, staffing
+  2. AI Training Platform            — hotel staff training, SOPs, assignments
+  3. AI Security Command Center      — live security/operations situational map
+
+The landing page also features three videos (aerial hero, suite, and an F&B service band).
+
+
+HOW TO OPEN
+-----------
+Easiest (recommended — guarantees the videos autoplay):
+
+  • Mac:      double-click  "Start (Mac).command"
+  • Windows:  double-click  "Start (Windows).bat"
+
+  This starts a tiny local server and opens the site in your browser.
+  Keep the little black window open while viewing; close it when done.
+
+Quick look (no server):
+
+  • Double-click  index.html
+    Works in most browsers. If a background video doesn't play, use Safari,
+    or use the "Start" launcher above.
+
+
+NOTES
+-----
+• 100% offline / self-contained. No installation, no internet required
+  (web fonts load online if available, otherwise system fonts are used).
+• From the landing page, click any of the three product cards to enter that app.
+• Use your browser's Back button to return to the landing page.
+
+© 2026 SUNWAY IntGen

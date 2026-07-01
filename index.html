@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>IntGen Stay Intelligence Engine | Hospitality AI Platform</title>
+  <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+  <link rel="stylesheet" href="css/design-system.css" />
+  <link rel="stylesheet" href="css/landing.css" />
+</head>
+<body>
+
+  <!-- ============ TOP NAV ============ -->
+  <header class="topbar" id="topbar">
+    <a class="logo" href="index.html">
+      <img class="logo__img" src="assets/img/sunway-intgen-logo.png" alt="SUNWAY IntGen" />
+      <span class="logo__divider"></span>
+      <span class="logo__sub">Stay</span>
+    </a>
+    <nav class="topbar__links">
+      <a href="#products">Platform</a>
+      <a href="apps/ai-training/index.html">AI Training</a>
+      <a href="apps/security-command-center/index.html">Command Center</a>
+      <a href="operations/index.html#/operations">Demand Forecasting</a>
+      <a class="btn btn-ghost" href="#products" style="padding:10px 20px;">Explore Modules</a>
+    </nav>
+  </header>
+
+  <!-- ============ SCREEN 1: HERO (full-bleed aerial video) ============ -->
+  <section class="hero">
+    <video class="hero__video" autoplay muted loop playsinline preload="auto" poster="">
+      <source src="assets/video/hero-aerial.mp4" type="video/mp4" />
+    </video>
+    <div class="hero__overlay"></div>
+
+    <div class="hero__content">
+      <div class="hero__brandmark">
+        <span class="pill"><span class="dot"></span> Hospitality intelligence live</span>
+      </div>
+      <h1 class="hero__title">IntGen Stay Intelligence Engine</h1>
+      <p class="hero__sub">The AI Layer for Modern Hospitality</p>
+      <div class="hero__triad">
+        <span>Every Guest.</span>
+        <span>Every Interaction.</span>
+        <span>Every Opportunity.</span>
+      </div>
+      <div class="hero__cta">
+        <a href="#products" class="btn btn-primary">Explore Platform</a>
+      </div>
+    </div>
+
+    <div class="hero__scroll">
+      <span>Scroll</span>
+      <span class="line"></span>
+    </div>
+  </section>
+
+  <!-- ============ SCREEN 2: UNIFIED GUEST INTELLIGENCE (suite video) ============ -->
+  <section class="uig" id="unified">
+    <div class="ambient" style="position:absolute;"></div>
+    <div class="container">
+      <div class="uig__grid">
+
+        <!-- LEFT: suite video (~55%) -->
+        <div class="uig__media" data-reveal>
+          <video autoplay muted loop playsinline preload="auto">
+            <source src="assets/video/suite.mp4" type="video/mp4" />
+          </video>
+          <div class="uig__media-glass">
+            <span class="pill uig__media-tag"><span class="dot"></span> Hospitality command layer</span>
+            <div class="uig__media-caption">
+              <h3>One intelligence across the entire stay</h3>
+              <p class="muted">From arrival to checkout, every operational signal is connected in one calm console.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- RIGHT: positioning copy -->
+        <div data-reveal>
+          <div class="uig__head">
+            <span class="eyebrow">The Platform</span>
+            <h2>Unified Guest<br/>Intelligence</h2>
+            <p class="muted">Three purpose-built intelligence layers — demand, people, and safety — working from the same operational signal. Each is its own focused workspace; enter the one your team needs.</p>
+          </div>
+          <div style="margin-top:30px;">
+            <a href="#products" class="btn btn-primary">See the three modules</a>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ F&B VIDEO TRANSITION BAND (16:9 full-bleed) ============ -->
+  <section class="fnb-band">
+    <video class="fnb-band__video" autoplay muted loop playsinline preload="auto">
+      <source src="assets/video/service-fnb-wide.mp4" type="video/mp4" />
+    </video>
+    <div class="fnb-band__overlay"></div>
+    <div class="fnb-band__content">
+      <span class="eyebrow eyebrow--tight eyebrow--center">Service, perfected at every touchpoint</span>
+      <h2 class="fnb-band__title">From every plate to every guest,<br/>intelligence in the details.</h2>
+      <p class="fnb-band__sub">The craft happens on the floor. The clarity to support it happens here.</p>
+    </div>
+  </section>
+
+  <!-- ============ THREE PRODUCT MODULES ============ -->
+  <section class="products" id="products">
+    <div class="ambient"></div>
+    <div class="container">
+      <div class="products__head" data-reveal>
+        <span class="eyebrow">Three Intelligence Layers</span>
+        <h2>Choose your workspace</h2>
+        <p>Each module is a complete, standalone product with its own console. Pick the layer that matches the decision in front of you.</p>
+      </div>
+
+      <div class="modlist-c">
+
+        <!-- 1 · AI TRAINING -->
+        <a class="mrow training" href="apps/ai-training/index.html" data-reveal>
+          <span class="mrow__num">01</span>
+          <div class="mrow__main">
+            <h3>AI Training Platform</h3>
+            <div class="mrow__sub">Staff training, SOP coaching &amp; service-excellence scoring</div>
+          </div>
+          <span class="mrow__cta" aria-hidden="true">→</span>
+        </a>
+
+        <!-- 2 · SECURITY COMMAND CENTER -->
+        <a class="mrow security" href="apps/security-command-center/index.html" data-reveal>
+          <span class="mrow__num">02</span>
+          <div class="mrow__main">
+            <h3>AI Security Command Center</h3>
+            <div class="mrow__sub">Live situational map · events, risk &amp; escalation in real time</div>
+          </div>
+          <span class="mrow__cta" aria-hidden="true">→</span>
+        </a>
+
+        <!-- 3 · DEMAND FORECASTING -->
+        <a class="mrow demand" href="operations/index.html#/operations" data-reveal>
+          <span class="mrow__num">03</span>
+          <div class="mrow__main">
+            <h3>Intelligent Demand Forecasting</h3>
+            <div class="mrow__sub">Real-time occupancy &amp; demand forecasts · staff and steer guests before the rush</div>
+          </div>
+          <span class="mrow__cta" aria-hidden="true">→</span>
+        </a>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ FOOTER ============ -->
+  <footer class="foot">
+    <div class="container flex between center" style="flex-wrap:wrap;gap:20px;">
+      <a class="logo" href="index.html">
+        <img class="logo__img" src="assets/img/sunway-intgen-logo.png" alt="SUNWAY IntGen" />
+        <span class="logo__divider"></span>
+        <span class="logo__sub">Stay</span>
+      </a>
+      <span class="faint">© 2026 SUNWAY IntGen · Hospitality AI Platform</span>
+    </div>
+  </footer>
+
+  <script src="js/landing.js"></script>
+</body>
+</html>
